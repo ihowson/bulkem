@@ -1,0 +1,19 @@
+Package: bulkem
+Title: Quickly Fit Many Mixture Models with Expectation Maximization
+Version: 0.0.0.9000
+Authors@R: person("Ian", "Howson", , "ian@mutexlabs.com", role = c("aut", "cre"))
+Description: This package makes EM mixture model fitting faster in two cases:
+    where you have many datasets to fit or where you need random
+    initialisation on difficult-to-fit datasets. It offers multicore support
+    and CUDA acceleration to perform fitting quickly. Supported mixture
+    distributions are univariate Normal and Inverse Gaussian.
+Depends: R (>= 3.1.2)
+License: MIT + file LICENSE
+LazyData: true
+Imports:
+    Rcpp,
+    statmod
+Suggests:
+    mixsmsn
+URL: http://github.com/ihowson/bulkem
+BugReports: https://github.com/ihowson/bulkem/issues
