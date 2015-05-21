@@ -1,3 +1,5 @@
+#' @useDynLib bulkem
+
 # Fit a number of finite mixture models using the Expectation Maximisation algorithm
 
 # Maximum likelihood estimate of model parameters for data x
@@ -11,67 +13,85 @@ invgaussMaximumLikelihood <- function(x) {
     return(result)
 }
 
-
+#' @export
 bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, use.gpu=TRUE, epsilon=0.000001, verbose=FALSE) {
     # TODO: GPU datapath
+    # bulkem_gpu(1, 2)
 
-    fits <- list()
+    # TODO perhaps an interface where you pass NA to use.gpu means 'do your best'; if you pass TRUE or FALSE, require that setting
 
     if (use.gpu) {
-        print("GPU datapath not implemented, falling back to CPU")
+        # TODO: check input argument types
+        # fits <- .Call('bulkem_gpu_', datasets, num.components, max.iters, random.inits, epsilon, verbose)
+        #' @useDynLib bulkem bulkem_gpu_
+        fits <- .Call(bulkem_host, datasets, num.components, max.iters, random.inits, epsilon, verbose)
+        # fits$gpu <- TRUE
+        # fits <- list('foobar')
+
+        # TODO if GPU failed, fall back to CPU
+        # use.gpu <- FALSE
     }
 
-    print("Using CPU datapath")
+    if (use.gpu == FALSE) {
+        print("Using CPU datapath")
 
-    # for each dataset...
-    for (name in names(datasets)) {
-        if (verbose) {
-            print(name)
-        }
-        x <- datasets[[name]]
+        fits <- list()
 
-        # RANDOMISED INITIALISATION
-        # For j attempts, sample a few items from the dataset. Calculate the
-        # maximum likelihood parameters and use those as initial parameters for a
-        # mixture component attempt.
-
-        best.fit <- NULL
-
-        # for j replicates
-        for (j in 1:random.inits) {
+        # for each dataset...
+        for (name in names(datasets)) {
             if (verbose) {
-                print(paste('    attempt', j))
+                print(name)
             }
-            initials <- list()
+            x <- datasets[[name]]
 
-            # come up with initial conditions
-            for (m in 1:num.components) {
-                # take a subset of the data
-                # modified from http://stackoverflow.com/a/19861866/591483
-                items <- sample(1:length(x), 3)
-                randomsubset <- x[items]
+            # RANDOMISED INITIALISATION
+            # For j attempts, sample a few items from the dataset. Calculate the
+            # maximum likelihood parameters and use those as initial parameters for a
+            # mixture component attempt.
 
-                ml <- invgaussMaximumLikelihood(randomsubset)
-                ml$alpha <- 0.5  # start with equal mixing proportions
+            best.fit <- NULL
 
-                initials[[m]] <- ml
+            # for j replicates
+            for (j in 1:random.inits) {
+                if (verbose) {
+                    print(paste('    attempt', j))
+                }
+                initials <- list()
+
+                # come up with initial conditions
+                for (m in 1:num.components) {
+                    # take a subset of the data
+                    # modified from http://stackoverflow.com/a/19861866/591483
+                    items <- sample(1:length(x), 3)
+                    randomsubset <- x[items]
+
+                    ml <- invgaussMaximumLikelihood(randomsubset)
+                    ml$alpha <- 0.5  # start with equal mixing proportions
+
+                    initials[[m]] <- ml
+                }
+
+                # perform the fit
+                fit <- invgaussmixEM(x, initials=initials, num.components=num.components, max.iters=max.iters, epsilon=epsilon)
+                # print(paste0('fit llik: ', fit$llik, 'alpha: ', fit$alpha, ', lambda=', fit$lambda, ', mu=', fit$mu))
+
+                if (is.null(best.fit)) {
+                    best.fit <- fit
+                } else if (fit$llik > best.fit$llik) {
+                    # print(paste0('found better ', fit$llik))
+                    best.fit <- fit
+                }
             }
 
-            # perform the fit
-            fit <- invgaussmixEM(x, initials=initials, num.components=num.components, max.iters=max.iters, epsilon=epsilon)
-            # print(paste0('fit llik: ', fit$llik, 'alpha: ', fit$alpha, ', lambda=', fit$lambda, ', mu=', fit$mu))
-
-            if (is.null(best.fit)) {
-                best.fit <- fit
-            } else if (fit$llik > best.fit$llik) {
-                # print(paste0('found better ', fit$llik))
-                best.fit <- fit
-            }
+            # save results
+            fits[[name]] <- best.fit
         }
-
-        # save results
-        fits[[name]] <- best.fit
     }
 
     return(fits)
+}
+
+
+.onUnload <- function (libpath) {
+    library.dynam.unload("bulkem", libpath)
 }

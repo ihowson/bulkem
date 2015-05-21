@@ -1,7 +1,5 @@
 # EM implementation
 
-require(statmod)
-
 # M is number of mixture components - probably best to rename it
 invgaussmixEM <- function(x, num.components=2, initials=NULL, max.iters=100, epsilon=0.000001) {
     # TODO check that arguments are valid

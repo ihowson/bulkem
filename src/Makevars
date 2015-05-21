@@ -1,0 +1,8 @@
+CUDA_PATH ?= /Developer/NVIDIA/CUDA-6.5
+PKG_LIBS = -Lcuda -lbulkem_cuda -rpath $(CUDA_PATH)/lib -L $(CUDA_PATH)/lib -lcudart
+
+$(SHLIB): cuda/libbulkem_cuda.a
+
+cuda/libbulkem_cuda.a:
+        @(cd cuda && $(MAKE) libbulkem_cuda.a \
+          CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")

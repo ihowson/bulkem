@@ -10,10 +10,10 @@ Description: This package makes EM mixture model fitting faster in two cases:
 Depends: R (>= 3.1.2)
 License: MIT + file LICENSE
 LazyData: true
-Imports:
-    Rcpp,
-    statmod
-Suggests:
-    mixsmsn
+Imports: 
+    statmod,
+Suggests: 
+    mixsmsn,
+    testthat
 URL: http://github.com/ihowson/bulkem
 BugReports: https://github.com/ihowson/bulkem/issues
