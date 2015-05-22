@@ -3,7 +3,6 @@
 #include <sys/time.h>
 
 #include "../bulkem.h"
-#include "common.h"
 
 
     /*
@@ -47,22 +46,23 @@ int bulkem_cuda(fit_params *fp)
         return -4;
     }
 
-    printf("There are %d GPUs\n", num_gpus);
+    if (fp->verbose)
+        printf("There are %d GPUs\n", num_gpus);
+
     if (num_gpus != 1) {
-        printf("a\n");
         // error("We only support a single GPU right now");
         // return ScalarReal(-1000.0);
+
+        // FIXME: return a more informative error message
         return -1;
     }
 
-        printf("b\n");
     // fire up some threads
     // FIXME: you might revise this in light of the multiple initialisations thing (you could just do one dataset at a time but multiple times; better cache locality, perhaps)
-    printf("Processing %d datasets simultaneously\n", NUM_THREADS);
-    pthread_t threads[NUM_THREADS];
-    // thread_args_t args[SIMULTANEOUS_KERNELS];
+    if (fp->verbose)
+        printf("Processing %d datasets simultaneously\n", NUM_THREADS);
 
-        // int32_t current_chunk_id = 0;
+    pthread_t threads[NUM_THREADS];
 
     gettimeofday(&start_time, 0);
 

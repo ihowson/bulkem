@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 #include "../bulkem.h"
-#include "common.h"
 #include "cxx11.h"
 // TODO: this is only used for checkCudaErrors - try to remove it
 #include "helper_cuda.h"
@@ -250,8 +249,11 @@ void stream_main(fit_params *fp)
         if (fp->verbose)
             printf("using blockSize=%d gridSize=%d\n", blockSize, gridSize);
 
-        invgauss_params_t *best_params;
+        invgauss_params_t best_init_params[MAX_COMPONENTS];
+        invgauss_params_t best_final_params[MAX_COMPONENTS];
         double best_loglik = -INFINITY;
+        int best_iterations = 0;
+        fit_result best_result = FIT_FAILED;
         
         // copy chunk to device
         int chunk_bytes = ds->num_observations * sizeof(double);
@@ -266,15 +268,17 @@ void stream_main(fit_params *fp)
             init_again = 0;
             // init device parameters
             // FIXME: you should save the initial params for later analysis if this turns out to be the best solution
-            generate_invgauss_initial_params(ds->data, ds->num_observations, fp->num_components, rng, params_new);
+            generate_invgauss_initial_params(ds->data, ds->num_observations, fp->num_components, rng, start_params);
 
             /*
             printf("starting params are:\n");
             for (int m = 0; m < fp->num_components; m++)
-                printf("\tlambda=%lf mu=%lf alpha=%lf\n", params_new[m].lambda, params_new[m].mu, params_new[m].alpha);
+                printf("\tlambda=%lf mu=%lf alpha=%lf\n", start_params[m].lambda, start_params[m].mu, start_params[m].alpha);
 
             printf("\n");
             */
+
+            memcpy(params_new, start_params, sizeof(invgauss_params_t) * fp->num_components);
 
             bool converged = false;
             bool failed = false;
@@ -405,20 +409,29 @@ void stream_main(fit_params *fp)
             */
             
 
-            printf("    init %d loglik = %lf\n", init, best_loglik);
+            // printf("    init %d loglik = %lf\n", init, best_loglik);
             // we've converged; is this solution better than the last?
             if (*host_loglik > best_loglik)
             {
+                best_result = FIT_SUCCESS;
                 best_loglik = *host_loglik;
-                memcpy(best_params, params_new, sizeof(invgauss_params_t) * fp->num_components);
+                best_iterations = iteration; // TODO: there might be an off-by-one here
+                memcpy(best_final_params, params_new, sizeof(invgauss_params_t) * fp->num_components);
+                memcpy(best_init_params, start_params, sizeof(invgauss_params_t) * fp->num_components);
             }
         }
 
-        printf("DONE: loglik = %lf\n", best_loglik);
+        // printf("DONE: loglik = %lf\n", best_loglik);
 
-        // at this point, we've run many iterations of the same dataset
-        // TODO: also save results of the fit into a return array somewhere
+        // Save the final fit results
+        // TODO you could do this within the loop to remove some code
+        ds->fr = best_result;
+        ds->final_loglik = best_loglik;
+        memcpy(ds->fit_params, best_final_params, sizeof(invgauss_params_t) * fp->num_components);
+        memcpy(ds->init_params, best_init_params, sizeof(invgauss_params_t) * fp->num_components);
+        ds->num_iterations = best_iterations;
 
+        // Do the next dataset
         chunk_id = chunk_get();
     }
 }

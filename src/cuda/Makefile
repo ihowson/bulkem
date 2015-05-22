@@ -205,7 +205,6 @@ endif
 
 cxx11.o: cxx11.cpp
 	$(EXEC) $(GCC) $(INCLUDES) -std=c++11 $(ALL_CCFLAGS) -o $@ -c $<
-	# $(EXEC) $(GCC) $(INCLUDES) -std=c++0x $(ALL_CCFLAGS) -o $@ -c $<
 
 lp_sum.o: lp_sum.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
