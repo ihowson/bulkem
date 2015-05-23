@@ -16,17 +16,19 @@ invgaussMaximumLikelihood <- function(x) {
 #' @export
 bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, use.gpu=TRUE, epsilon=0.000001, verbose=FALSE) {
     # TODO: GPU datapath
-    # bulkem_gpu(1, 2)
 
     # TODO perhaps an interface where you pass NA to use.gpu means 'do your best'; if you pass TRUE or FALSE, require that setting
 
     if (use.gpu) {
         # TODO: check input argument types
-        # fits <- .Call('bulkem_gpu_', datasets, num.components, max.iters, random.inits, epsilon, verbose)
         #' @useDynLib bulkem bulkem_gpu_
         fits <- .Call(bulkem_host, datasets, num.components, max.iters, random.inits, epsilon, verbose)
-        # fits$gpu <- TRUE
-        # fits <- list('foobar')
+
+        # TODO: fits$gpu <- TRUE
+
+        for (index in range(length(datasets))) {
+            names(fits[[index]]) <- c('lambda', 'mu', 'alpha', 'init_lambda', 'init_mu', 'init_alpha', 'loglik', 'num_iterations', 'fit_success')
+        }
 
         # TODO if GPU failed, fall back to CPU
         # use.gpu <- FALSE

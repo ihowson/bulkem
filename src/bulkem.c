@@ -77,20 +77,26 @@ SEXP bulkem_host(SEXP datasets_, SEXP num_components_, SEXP max_iters_, SEXP ran
         // note that child objects of 'fits' are automatically protected, so
         // no need to explicitly protect them
 
-        // SEXP lambda = allocVector(REALSXP, fp->num_components);
-        // SEXP mu = allocVector(REALSXP, fp->num_components);
-        // SEXP alpha = allocVector(REALSXP, fp->num_components);
-        // SEXP init_lambda = allocVector(REALSXP, fp->num_components);
-        // SEXP init_mu = allocVector(REALSXP, fp->num_components);
-        // SEXP init_alpha = allocVector(REALSXP, fp->num_components);
+        SEXP lambda = allocVector(REALSXP, fp.num_components);
+        SEXP mu = allocVector(REALSXP, fp.num_components);
+        SEXP alpha = allocVector(REALSXP, fp.num_components);
+        SEXP init_lambda = allocVector(REALSXP, fp.num_components);
+        SEXP init_mu = allocVector(REALSXP, fp.num_components);
+        SEXP init_alpha = allocVector(REALSXP, fp.num_components);
 
-        SEXP lambda = allocVector(REALSXP, 0);
-        SEXP mu = allocVector(REALSXP, 0);
-        SEXP alpha = allocVector(REALSXP, 0);
-        SEXP init_lambda = allocVector(REALSXP, 0);
-        SEXP init_mu = allocVector(REALSXP, 0);
-        SEXP init_alpha = allocVector(REALSXP, 0);
-        // FIXME: set the value of the above SEXPs
+        for (int m = 0; m < fp.num_components; m++)
+        {
+            REAL(lambda)[m] = ds->fit_params[m].lambda;
+            REAL(mu)[m] = ds->fit_params[m].mu;
+            REAL(alpha)[m] = ds->fit_params[m].alpha;
+            REAL(init_lambda)[m] = ds->init_params[m].lambda;
+            REAL(init_mu)[m] = ds->init_params[m].mu;
+            REAL(init_alpha)[m] = ds->init_params[m].alpha;
+        }
+
+        int fit_success = 0;
+        if (ds->fr == FIT_SUCCESS)
+            fit_success = 1;
 
         // NOTE: we set the names of the elements on the R side. If you change
         // the following ordering, make sure you change the R code too.
@@ -102,23 +108,7 @@ SEXP bulkem_host(SEXP datasets_, SEXP num_components_, SEXP max_iters_, SEXP ran
         SET_VECTOR_ELT(dsr, 5, init_alpha);
         SET_VECTOR_ELT(dsr, 6, ScalarReal(ds->final_loglik));
         SET_VECTOR_ELT(dsr, 7, ScalarInteger(ds->num_iterations));
-
-        // FIXME: the following needs to translate from the enum to a bool
-        // FIXME: also should use a bool type, not ScalarInteger
-        SET_VECTOR_ELT(dsr, 8, ScalarInteger(ds->fr));
-
-
-
-
-
-
-        // the list contains:
-        // lambda, mu, alpha: vectors of parameter estimates; i.e. lambda[1] contains lambda estimate for component 1
-        // loglik: final log-likelihood
-        // init_lambda, init_mu, init_alpha: initial component parameters
-        // num_iterations: for the best fit, the number of iterations performed
-        // success: TRUE/FALSE for whether the dataset could be fit
-
+        SET_VECTOR_ELT(dsr, 8, ScalarLogical(fit_success));
 
         // FIXME: this doesn't quite match the R interface
 

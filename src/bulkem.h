@@ -53,18 +53,6 @@ typedef struct _fit_params {
     int max_iters;
 } fit_params;
 
-/*
-typedef struct _fit_result {
-    // success, error (too many iterations, nonconverging)
-
-    int success;
-
-    int num_iterations;
-    initial parameters
-    final parameters
-    posterior probabilities (?)
-    */
-
 
 #ifdef __cplusplus
 extern "C" {

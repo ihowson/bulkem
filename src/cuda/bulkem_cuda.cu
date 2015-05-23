@@ -5,27 +5,9 @@
 #include "../bulkem.h"
 
 
-    /*
-typedef struct _thread_args_t
-{
-    unsigned thread_id;
-    double *device_chunk; // this is a device pointer
-
-    // posterior_t *device_posterior; // this is a device pointer
-
-    control_t *device_control; // this is a device pointer
-    double *host_dataset; // full dataset stored on host
-    // posterior_t *host_posterior; // 1:1 posterior probabilities for each observation
-    control_t *host_controls; // controls stored on host
-    int *current_chunk_id; // pointer to shared chunk_id counter
-} thread_args_t;
-*/
-
 void *thread(void *void_args)
 {
-    // thread_args_t *args = (thread_args_t *)void_args;
     fit_params *fp = (fit_params *)void_args;
-    printf("thread\n");
     stream_main(fp);
     return 0;
 }
