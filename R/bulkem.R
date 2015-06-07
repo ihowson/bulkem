@@ -19,7 +19,7 @@ bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, us
 
     # TODO perhaps an interface where you pass NA to use.gpu means 'do your best'; if you pass TRUE or FALSE, require that setting
 
-    if (use.gpu) {
+    if (use.gpu == TRUE) {
         # TODO: check input argument types
         #' @useDynLib bulkem bulkem_gpu_
         fits <- .Call(bulkem_host, datasets, num.components, max.iters, random.inits, epsilon, verbose)
@@ -35,16 +35,19 @@ bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, us
     }
 
     if (use.gpu == FALSE) {
-        print("Using CPU datapath")
+        if (verbose) {
+            print("Using CPU datapath")
+        }
 
         fits <- list()
 
         # for each dataset...
-        for (name in names(datasets)) {
+        # print(sprintf('len %d', length(datasets)))
+        for (index in 1:length(datasets)) {
             if (verbose) {
-                print(name)
+                print(sprintf('index %d', index))
             }
-            x <- datasets[[name]]
+            x <- datasets[[index]]
 
             # RANDOMISED INITIALISATION
             # For j attempts, sample a few items from the dataset. Calculate the
@@ -75,18 +78,18 @@ bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, us
 
                 # perform the fit
                 fit <- invgaussmixEM(x, initials=initials, num.components=num.components, max.iters=max.iters, epsilon=epsilon)
-                # print(paste0('fit llik: ', fit$llik, 'alpha: ', fit$alpha, ', lambda=', fit$lambda, ', mu=', fit$mu))
+                # print(paste0('fit llik: ', fit$llik, ', alpha: ', fit$alpha, ', lambda=', fit$lambda, ', mu=', fit$mu))
 
                 if (is.null(best.fit)) {
                     best.fit <- fit
-                } else if (fit$llik > best.fit$llik) {
+                } else if (!is.null(fit) && (fit$llik > best.fit$llik)) {
                     # print(paste0('found better ', fit$llik))
                     best.fit <- fit
                 }
             }
 
             # save results
-            fits[[name]] <- best.fit
+            fits[[index]] <- best.fit
         }
     }
 

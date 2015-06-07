@@ -25,22 +25,27 @@ invgaussmixEM <- function(x, num.components=2, initials=NULL, max.iters=100, eps
     diff <- 1
     log.lik <- epsilon + 1
 
-    x_expanded <- matrix(x, nrow=N, ncol=2, byrow=FALSE)
+    x_expanded <- matrix(x, nrow=N, ncol=num.components, byrow=FALSE)
 
     # algorithm based off http://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm#Gaussian_mixture
 
     while (diff > epsilon && iterations <= max.iters) {
         iterations <- iterations + 1
 
+        if (any(is.na(mu)) || any(is.na(lambda)) || any(is.na(alpha))) {
+            print('non-converging')
+            return(NULL)
+        }
+
         # TODO: this might be faster/better expressed using rep_len
-        mu_expanded <- matrix(mu, nrow=N, ncol=2, byrow=TRUE)
-        lambda_expanded <- matrix(lambda, nrow=N, ncol=2, byrow=TRUE)
-        alpha_expanded <- matrix(alpha, nrow=N, ncol=2, byrow=TRUE)
+        mu_expanded <- matrix(mu, nrow=N, ncol=num.components, byrow=TRUE)
+        lambda_expanded <- matrix(lambda, nrow=N, ncol=num.components, byrow=TRUE)
+        alpha_expanded <- matrix(alpha, nrow=N, ncol=num.components, byrow=TRUE)
 
         # E-step: calculate Q
 
         # calculate p(l|x_i, Theta^g)
-        x.prob <- dinvgauss(x_expanded, mean=mu_expanded, shape=lambda_expanded)  # N x 2 matrix
+        x.prob <- dinvgauss(x_expanded, mean=mu_expanded, shape=lambda_expanded)  # N x M matrix
 
         # have we converged to within epsilon?
         # we do this up here and not at the end as we're doing parts of the calculation anyway
@@ -74,7 +79,7 @@ invgaussmixEM <- function(x, num.components=2, initials=NULL, max.iters=100, eps
         # LATER: it might make sense to try this algorithm using RGPU or something - it would be ideal to be able to plug in R code to your CUDA code. tHis might be a halfway option taht is fast enough
     }
 
-    result <- list(x=x, alpha=alpha, mu=mu, lambda=lambda, llik=log.lik)
+    result <- list(x=x, alpha=alpha, mu=mu, lambda=lambda, llik=log.lik, fit_success=TRUE)
     class(result) <- "mixEM"
     result
 }
