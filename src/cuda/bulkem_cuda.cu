@@ -3,6 +3,7 @@
 #include <sys/time.h>
 
 #include "../bulkem.h"
+#include "cxx11.h"
 
 
 void *thread(void *void_args)
@@ -31,6 +32,8 @@ int bulkem_cuda(fit_params *fp)
     if (fp->verbose)
         printf("There are %d GPUs\n", num_gpus);
 
+    chunk_reset();
+
     if (num_gpus != 1) {
         // error("We only support a single GPU right now");
         // return ScalarReal(-1000.0);
@@ -51,16 +54,6 @@ int bulkem_cuda(fit_params *fp)
     // launch threads
     for (unsigned i = 0; i < NUM_THREADS; i++)
     {
-        // set up arguments
-        // args[i].thread_id = i;
-        // args[i].device_chunk = device_chunks[i];
-        // args[i].device_posterior = device_posteriors[i];
-        // args[i].device_control = device_controls[i];
-        // args[i].current_chunk_id = &current_chunk_id;
-        // args[i].host_dataset = dataset;
-        // args[i].host_controls = host_controls;
-        // args[i].host_posterior = posterior;
-        // int rc = pthread_create(&threads[i], NULL, thread, (void *)&args[i]);
         int rc = pthread_create(&threads[i], NULL, thread, fp);
 
         if (rc)

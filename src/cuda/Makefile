@@ -219,9 +219,6 @@ libbulkem_cuda.a: $(OBJECTS)
 	ar cr libbulkem_cuda.a $(OBJECTS)
 	ranlib libbulkem_cuda.a
 
-# pcg-c/src/libpcg_random.a:
-# $(EXEC) make -C pcg-c
-
 clean:
 	rm -f *.o *.so *.a
 

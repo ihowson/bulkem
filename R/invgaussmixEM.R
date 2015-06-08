@@ -32,10 +32,7 @@ invgaussmixEM <- function(x, num.components=2, initials=NULL, max.iters=100, eps
     while (diff > epsilon && iterations <= max.iters) {
         iterations <- iterations + 1
 
-        if (any(is.na(mu)) || any(is.na(lambda)) || any(is.na(alpha))) {
-            print('non-converging')
-            return(NULL)
-        }
+        # print(sprintf("iteration %d mu0=%f mu1=%f la0=%f la1=%f al0=%f al1=%f", iterations, mu[1], mu[2], lambda[1], lambda[2], alpha[1], alpha[2]))
 
         # TODO: this might be faster/better expressed using rep_len
         mu_expanded <- matrix(mu, nrow=N, ncol=num.components, byrow=TRUE)
@@ -65,8 +62,12 @@ invgaussmixEM <- function(x, num.components=2, initials=NULL, max.iters=100, eps
         sum.prob <- rowSums(weighted.prob)  # second line of the T function from wikipedia (Nx1)
         member.prob <- weighted.prob / sum.prob
 
-        # we've got components across columns and observations down rows, so we do all of the summations simultaneously on both 
+        # Elements of sum.prob can go to 0 if the density is low enough.
+        # This causes divide-by-zero in the member.prob calculation. Replace
+        # any NaNs with 0.
+        member.prob[is.nan(member.prob)] <- 0
 
+        # we've got components across columns and observations down rows, so we do all of the summations simultaneously on both 
         member.prob.sum <- colSums(member.prob)
         alpha.new <- member.prob.sum / N  # should be 1xM matrix
         mu.new <- colSums(x * member.prob) / member.prob.sum  # should be 1xM matrix

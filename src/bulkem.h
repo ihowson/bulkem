@@ -8,7 +8,7 @@
 #define MAX_COMPONENTS 8
 
 // TODO: Ditto for max observations. This limit really ought to be lifted; 10k obs isn't very large
-#define MAX_OBSERVATIONS 10000
+#define MAX_OBSERVATIONS 1000000
 
 // This ought to work well for most modern machines (at least, as of 2015).
 // TODO: make it a parameter to the R interface

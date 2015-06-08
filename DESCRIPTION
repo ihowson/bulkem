@@ -7,7 +7,7 @@ Description: This package makes EM mixture model fitting faster in two cases:
     initialisation on difficult-to-fit datasets. It offers multicore support
     and CUDA acceleration to perform fitting quickly. Supported mixture
     distributions are univariate Normal and Inverse Gaussian.
-Depends: R (>= 3.1.2)
+Depends: R (>= 3.1.1)
 License: MIT + file LICENSE
 LazyData: true
 Imports: 

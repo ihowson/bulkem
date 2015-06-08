@@ -122,6 +122,11 @@ __global__ void member_prob_kernel(
         unsigned index = m * num_observations + t;
 
         double mp = weighted_prob[m] / sum_prob;
+        // Elements of sum.prob can go to 0 if the density is low enough.
+        // This causes divide-by-zero in the member.prob calculation. Replace
+        // any NaNs with 0.
+        if (isnan(mp))
+            mp = 0.0;
         g_member_prob[index] = mp;
 
         // we don't use this until the end, but it's convenient to calculate here
@@ -189,7 +194,6 @@ void stream_main(fit_params *fp)
     // allocated out here to avoid cudaMalloc in main loop
     // FIXME: need to move this to inner loop - realloc if it is too small
     double *dev_chunk; // N elements
-    //checkCudaErrors(cudaMalloc(&dev_chunk, sizeof(double) * N));
     checkCudaErrors(cudaMalloc(&dev_chunk, sizeof(double) * MAX_OBSERVATIONS));
 
     invgauss_params_t *dev_params;
@@ -434,4 +438,18 @@ void stream_main(fit_params *fp)
         // Do the next dataset
         chunk_id = chunk_get();
     }
+
+    // tidy up
+    cudaFree(dev_chunk);
+    cudaFree(dev_params);
+    cudaFree(dev_member_prob);
+    cudaFree(dev_x_times_member_prob);
+    cudaFree(dev_igresults);
+    cudaFree(dev_lambda_sum_arg);
+    cudaFree(dev_log_sum_prob);
+    cudaFree(dev_loglik);
+    cudaFree(params_new);
+    cudaFree(start_params);
+    cudaFree(host_igresults);
+    cudaFree(host_loglik);
 }
