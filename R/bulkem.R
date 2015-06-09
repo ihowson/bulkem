@@ -71,7 +71,7 @@ bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, us
                     randomsubset <- x[items]
 
                     ml <- invgaussMaximumLikelihood(randomsubset)
-                    ml$alpha <- 0.5  # start with equal mixing proportions
+                    ml$alpha <- 1 / num.components  # start with equal mixing proportions
 
                     initials[[m]] <- ml
                 }

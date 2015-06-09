@@ -52,7 +52,7 @@ void generate_invgauss_initial_params(double *x, int n, int num_components, unif
         }
     
         result[m] = invgauss_maximum_likelihood(sample, 3);
-        result[m].alpha = 0.5;
+        result[m].alpha = 1.0 / num_components;
     }
 }
 
