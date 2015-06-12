@@ -26,7 +26,7 @@ bulkem <- function(datasets, num.components=2, max.iters=100, random.inits=1, us
 
         # TODO: fits$gpu <- TRUE
 
-        for (index in range(length(datasets))) {
+        for (index in 1:range(length(datasets))) {
             names(fits[[index]]) <- c('lambda', 'mu', 'alpha', 'init_lambda', 'init_mu', 'init_alpha', 'loglik', 'num_iterations', 'fit_success')
         }
 

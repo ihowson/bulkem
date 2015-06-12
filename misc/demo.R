@@ -12,9 +12,9 @@ NUM_REPEATS <- 10  # perform 10 random inits of each dataset
 run <- function(xlist, use.gpu) {
     fits <- bulkem(datasets=xlist, use.gpu=use.gpu)
 
-    f <- fits[[100]]
+    f <- fits[[1]]
 
-    print(sprintf("The last fit looks like mu=[%f %f], lambda=[%f %f], alpha=[%f %f]", f$mu[[1]], f$mu[[2]], f$lambda[[1]], f$lambda[[2]], f$alpha[[1]], f$alpha[[2]]))
+    print(sprintf("The first fit looks like mu=[%f %f], lambda=[%f %f], alpha=[%f %f]", f$mu[[1]], f$mu[[2]], f$lambda[[1]], f$lambda[[2]], f$alpha[[1]], f$alpha[[2]]))
 }
 
 make.dataset <- function(x) {
