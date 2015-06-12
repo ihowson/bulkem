@@ -49,3 +49,19 @@ Finally, we can install `bulkem`. This is manual at the moment:
     $ LD_LIBRARY_PATH=/usr/local/cuda/lib64 R
     > devtools::build()
     > devtools::install()
+
+`demo.R` provides a simple demonstration:
+
+    > source('misc/demo.R')
+
+On my computer, this produces:
+
+    > source('misc/demo.R')
+    [1] "--- Using GPU: 1. 100 datasets with 2000 observations in each, 10 attempts per dataset."
+    Processed 100 chunks
+    cuda parallel: 0.423166 seconds elapsed
+    [1] "The last fit looks like mu=[2.783511 1.015576], lambda=[0.210135 28.845700], alpha=[0.722182 0.277818]"
+    [1] "    Completed in 0.511000 seconds"
+    [1] "--- Using GPU: 0. 100 datasets with 2000 observations in each, 10 attempts per dataset."
+    [1] "The last fit looks like mu=[1.015576 2.783510], lambda=[28.845905 0.210135], alpha=[0.277818 0.722182]"
+    [1] "    Completed in 10.214000 seconds"
