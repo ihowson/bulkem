@@ -1,8 +1,16 @@
-CUDA_PATH ?= /Developer/NVIDIA/CUDA-6.5
-PKG_LIBS = -Lcuda -lbulkem_cuda -rpath $(CUDA_PATH)/lib -L $(CUDA_PATH)/lib -lcudart
+# On Amazon EC2:
+# CUDA_PATH ?= /opt/nvidia/cuda
+
+# On Ubuntu Trusty:
+CUDA_PATH ?= /usr/local/cuda-6.5
+PKG_LIBS = -Lcuda -lbulkem_cuda -L $(CUDA_PATH)/lib -lcudart
+## PKG_LIBS = -Lcuda -fPIC -lbulkem_cuda -L $(CUDA_PATH)/lib -lcudart
+
+# if Darwin:
+#CUDA_PATH ?= /Developer/NVIDIA/CUDA-6.5
+#PKG_LIBS = -Lcuda -lbulkem_cuda -rpath $(CUDA_PATH)/lib -L $(CUDA_PATH)/lib -lcudart
 
 $(SHLIB): cuda/libbulkem_cuda.a
 
 cuda/libbulkem_cuda.a:
-        @(cd cuda && $(MAKE) libbulkem_cuda.a \
-          CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")
+	@(cd cuda && $(MAKE)

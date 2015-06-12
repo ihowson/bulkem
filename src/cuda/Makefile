@@ -102,20 +102,10 @@ ifneq ($(DARWIN),)
   LDFLAGS += -rpath $(CUDA_PATH)/lib
   #CCFLAGS += -arch $(OS_ARCH)
 else
-  ifeq ($(OS_ARCH),armv7l)
-    ifeq ($(abi),androideabi)
-      NVCCFLAGS += -target-os-variant Android
-    else
-      ifeq ($(abi),gnueabi)
-        CCFLAGS += -mfloat-abi=softfp
-      else
-        # default to gnueabihf
-        override abi := gnueabihf
-        LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
-        CCFLAGS += -mfloat-abi=hard
-      endif
-    endif
-  endif
+  # for Linux
+  EXTRA_CCFLAGS     += -fPIC -shared
+  EXTRA_NVCCFLAGS   += -Xcompiler -fPIC
+
 endif
 
 ifeq ($(ARMv7),1)
@@ -205,6 +195,7 @@ endif
 
 cxx11.o: cxx11.cpp
 	$(EXEC) $(GCC) $(INCLUDES) -std=c++11 $(ALL_CCFLAGS) -o $@ -c $<
+	# 	$(EXEC) $(GCC) $(INCLUDES) -std=c++11 -m64 -fPIC -rdynamic -shared -o $@ -c $<
 
 lp_sum.o: lp_sum.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
