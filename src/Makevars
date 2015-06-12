@@ -2,9 +2,8 @@
 # CUDA_PATH ?= /opt/nvidia/cuda
 
 # On Ubuntu Trusty:
-CUDA_PATH ?= /usr/local/cuda-6.5
-PKG_LIBS = -Lcuda -lbulkem_cuda -L $(CUDA_PATH)/lib -lcudart
-## PKG_LIBS = -Lcuda -fPIC -lbulkem_cuda -L $(CUDA_PATH)/lib -lcudart
+CUDA_PATH ?= /usr/local/cuda
+PKG_LIBS = -Lcuda -fPIC -lbulkem_cuda -L $(CUDA_PATH)/lib64 -lcudart -lstdc++
 
 # if Darwin:
 #CUDA_PATH ?= /Developer/NVIDIA/CUDA-6.5

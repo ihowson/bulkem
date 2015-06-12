@@ -144,7 +144,7 @@ __global__ void member_prob_kernel(
 
 void dump_dev_array(const char *msg, double *dev_array, int offset = 0)
 {
-    printf("tid %p %s: ", pthread_self(), msg);
+    printf("tid %li %s: ", pthread_self(), msg);
     for (int i = offset; i < offset + 4; i++)
     {
         double val;
@@ -164,7 +164,7 @@ void dump_dev_value(const char *msg, double *dev_ptr, cudaStream_t stream)
     checkCudaErrors(cudaStreamSynchronize(stream));
     checkCudaErrors(cudaMemcpyAsync(&val, dev_ptr, sizeof(double), cudaMemcpyDeviceToHost, 0));
     checkCudaErrors(cudaStreamSynchronize(0));
-    printf("tid %p %s: %lf \n", pthread_self(), msg, val);
+    printf("tid %li %s: %lf \n", pthread_self(), msg, val);
 }
 
 /* So that we only have one memcpy back from the device, we combine the results into this struct and copy them in one operation */
@@ -234,7 +234,7 @@ void stream_main(fit_params *fp)
     while (chunk_id < fp->num_datasets)
     {
         if (fp->verbose)
-            printf("thread %p chunk %d\n", pthread_self(), chunk_id);
+            printf("thread %li chunk %d\n", pthread_self(), chunk_id);
 
         dataset *ds = &fp->datasets[chunk_id];
         int N = ds->num_observations;
@@ -388,7 +388,7 @@ void stream_main(fit_params *fp)
                     break;
                 
                 /*
-                printf("thread %p iter %d\n", pthread_self(), iteration);
+                printf("thread %li iter %d\n", pthread_self(), iteration);
                 for (int m = 0; m < fp->num_components; m++)
                 {
                     invgauss_params_t *p = &params_new[m];
@@ -404,7 +404,7 @@ void stream_main(fit_params *fp)
             // Disabling this gains about .5 seconds on a 5 second run
             
             /*
-            printf("thread %p fit chunk %d after %d iterations\n", pthread_self(), chunk_id, iteration);
+            printf("thread %li fit chunk %d after %d iterations\n", pthread_self(), chunk_id, iteration);
             for (int m = 0; m < fp->num_components; m++)
             {
                 invgauss_params_t *p = &params_new[m];
