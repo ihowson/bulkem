@@ -47,7 +47,11 @@ DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 ifneq ($(DARWIN),)
 	CUDA_PATH       ?= /Developer/NVIDIA/CUDA-6.5
 else
-	CUDA_PATH       ?= /opt/nvidia/cuda
+	# for Amazon EC2
+	#CUDA_PATH       ?= /opt/nvidia/cuda
+
+	# for Ubuntu Trusty
+	CUDA_PATH       ?= /usr/local/cuda
 endif
 
 ifneq ($(DARWIN),)
