@@ -34,7 +34,7 @@ int bulkem_cuda(fit_params *fp)
 
     chunk_reset();
 
-    if (num_gpus != 1) {
+    if (num_gpus < 1) {
         // error("We only support a single GPU right now");
         // return ScalarReal(-1000.0);
 
